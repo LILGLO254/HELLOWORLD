@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · School Management{% endblock %}
+{% block body_class %}dash{% endblock %}
+
+{% block content %}
+<header class="topbar">
+    <strong>School Management</strong>
+    <div class="topbar-user">
+        <span>{{ current_user['name'] }} ({{ current_user['role'] }})</span>
+        <form method="post" action="{{ url_for('logout') }}">
+            <button type="submit" class="btn btn-small">Log out</button>
+        </form>
+    </div>
+</header>
+
+<main class="page">
+    <h1>Dashboard</h1>
+    <p class="muted">Signed in as {{ current_user['email'] }}</p>
+
+    <dl class="stats">
+        <div><dt>Workers</dt><dd>{{ total_workers }}</dd></div>
+        <div><dt>Active</dt><dd>{{ active_workers }}</dd></div>
+        <div><dt>Inactive</dt><dd>{{ inactive_workers }}</dd></div>
+        <div><dt>Courses</dt><dd>{{ total_courses }}</dd></div>
+    </dl>
+
+    <section>
+        <h2>Workers by department</h2>
+        {% if departments %}
+        <ul class="bars">
+            {% for d in departments %}
+            <li>
+                <span class="bar-label">{{ d['name'] }}</span>
+                <span class="bar-track">
+                    <span class="bar-fill" style="width: {{ d['percentage'] }}%"></span>
+                </span>
+                <span class="bar-value">{{ d['count'] }} ({{ d['percentage'] }}%)</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">No departments yet. They appear once workers are added.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Workers</h2>
+        {% if workers %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Staff no.</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for w in workers %}
+                    <tr>
+                        <td>{{ w['staff_no'] }}</td>
+                        <td>{{ w['name'] }}</td>
+                        <td>{{ w['email'] }}</td>
+                        <td>{{ w['department'] or 'Unassigned' }}</td>
+                        <td>{{ w['role'] }}</td>
+                        <td><span class="status {{ w['status'] }}">{{ w['status'] }}</span></td>
+                        <td>{{ w['created_at'].strftime('%d %b %Y') if w['created_at'] else '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty">No workers yet. Insert rows into the <code>workers</code> table to list them here.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Courses</h2>
+        {% if courses %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Course</th>
+                        <th>Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in courses %}
+                    <tr>
+                        <td>{{ c['code'] }}</td>
+                        <td>{{ c['course_name'] }}</td>
+                        <td>{{ c['credits'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty">No courses yet. Insert rows into the <code>courses</code> table to list them here.</p>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
